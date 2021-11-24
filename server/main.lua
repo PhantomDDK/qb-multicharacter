@@ -2,14 +2,10 @@ QBCore = nil
 TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
 
 QBCore.Functions.CreateCallback("qb-multicharacter:server:GetUserCharacters", function(source, cb)
-    local src = source
+    local license = QBCore.Functions.GetIdentifier(source, 'license')
 
-    QBCore.Functions.ExecuteSql(false, 'SELECT * FROM `players` WHERE `steam` = \'' .. GetPlayerIdentifier(src) ..'\'', function(result)
-        if result ~= nil then
-            cb(result)
-        else
-            cb(false)
-        end
+    exports.oxmysql:execute('SELECT * FROM players WHERE license = ?', {license}, function(result)
+        cb(result)
     end)
 end)
 
@@ -20,10 +16,10 @@ QBCore.Functions.CreateCallback("qb-multicharacter:server:GetServerLogs", functi
 end)
 
 QBCore.Functions.CreateCallback("test:yeet", function(source, cb)
-    local steamId = GetPlayerIdentifiers(source)[1]
+    local license = QBCore.Functions.GetIdentifier(source, 'license')
     local plyChars = {}
     
-    exports['ghmattimysql']:execute('SELECT * FROM players WHERE steam = @steam', {['@steam'] = steamId}, function(result)
+    exports.oxmysql:execute('SELECT * FROM players WHERE license = ?', {license}, function(result)
         for i = 1, (#result), 1 do
             result[i].charinfo = json.decode(result[i].charinfo)
             result[i].money = json.decode(result[i].money)
